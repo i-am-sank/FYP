@@ -9,6 +9,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
+import WalletButton from './components/WalletButton';
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -102,9 +103,7 @@ const Topbar = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-              <Button sx={{ my: 2, color: 'white', display: 'block' }} >
-                Unlock wallet
-              </Button>
+              <WalletButton/>
            
             {/* <Menu
               sx={{ mt: '45px' }}

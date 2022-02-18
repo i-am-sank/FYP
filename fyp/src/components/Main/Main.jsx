@@ -1,5 +1,6 @@
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
+import CachedIcon from '@mui/icons-material/Cached';
 import { CardActions, CardContent, Fab, Paper, Modal, Box, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
@@ -37,7 +38,7 @@ const Main = () => {
                     
                 </CardContent>
                 <CardActions>
-                    <Button loading sx={{margin: 'auto'}}>Current Balance</Button>
+                    <Button loading sx={{margin: 'auto'}} startIcon={<CachedIcon/> } >Current Balance</Button>
                 </CardActions>
             </Card>
             </Paper>
