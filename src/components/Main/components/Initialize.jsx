@@ -4,16 +4,11 @@ import {useState} from "react";
 
 
 const style = {
-    position: 'absolute',
     display: 'flex',
     flexDirection: 'column',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
     width: 300,
-    bgcolor: 'background.paper',
     textAlign: 'center',
-    boxShadow: 24,
+    margin: 'auto',
     p: 4,
   };
 

@@ -1,4 +1,4 @@
-import { Paper } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { getOwner, getPaymentContractAddress, getUserData } from "../contracts/paymentV1"
@@ -10,9 +10,7 @@ import Initialize from './components/Initialize';
 const Main = () => {
 
     const {
-        account,
-        status,
-        connect,
+        account
     } = useWallet();
 
     let [owner, setOwner] = useState('');
@@ -22,33 +20,47 @@ const Main = () => {
         balance: ""
     });
 
-    useEffect(async () => {
-        if(!!account) {
-            let _owner = await getOwner();
-            setOwner(_owner);
-
+    const fetchUserData = async () => {
+        if(!!account){
+            console.log('fecthing');
             let _userData = await getUserData();
             setUserData(_userData);
-
-            let _contractAddress = await getPaymentContractAddress();
-            setContractAddress(_contractAddress);
-        
         }
+    }
+
+    useEffect(() => {
+
+        const fetchdata = async () => {
+            if(!!account) {
+                let _owner = await getOwner();
+                setOwner(_owner);
+    
+                let _contractAddress = await getPaymentContractAddress();
+                setContractAddress(_contractAddress);
+            }
+        }
+        fetchdata();
+        fetchUserData();
+
     }, [account]);
     
+
     
     return (
         <div>
-            <Paper>
-                   <Typography variant='subtitle1' component='a' >
+            <Paper elevation={5}>
+                   <Box sx={{padding: '25px'}}>
+                   <Typography variant='subtitle1' color='GrayText' component='a' >
                       Contract Address : {contractAddress}
                     </Typography>
-
-                    <Typography variant='subtitle2' component="a">
+                    <br/>
+                    <Typography variant='subtitle1' color='GrayText' component="a">
                       Contract Owner : {owner}
                     </Typography>
+                   </Box>
             </Paper>
-            {userData.id !== "0" ? <Recharge userId={userData.id} userBalance={userData.balance} /> : <Initialize/>}
+            <br/>
+            {userData.id !== "0" ? <Recharge userId={userData.id} userBalance={userData.balance} fetchUserData={fetchUserData} /> : <Initialize/>}
         </div>
     )
 }

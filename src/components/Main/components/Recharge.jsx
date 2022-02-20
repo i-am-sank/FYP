@@ -1,7 +1,7 @@
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CachedIcon from '@mui/icons-material/Cached';
-import { CardActions, CardContent, Fab, Paper, Modal, Box, TextField, MenuItem, InputLabel, Select } from '@mui/material';
+import { CardActions, CardContent, Fab, Paper, Modal, Box, TextField, MenuItem, InputLabel, Select, FormControl } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import useWallet from "../../../hooks/useWallet";
@@ -21,7 +21,7 @@ const style = {
     p: 4,
   };
 
-const Recharge = ({userId , userBalance}) => {
+const Recharge = ({userId , userBalance, fetchUserData}) => {
 
     const [open, setOpen] = useState(false);
     const [acceptedTokensList, setTokensList] = useState([]);
@@ -29,16 +29,22 @@ const Recharge = ({userId , userBalance}) => {
         account
     } = useWallet();
     const [selectedToken, setSelectedToken] = useState(null);
-    const [rechargeValue, setRechargeValue] = useState(0);
+    const [rechargeValue, setRechargeValue] = useState(null);
     const [button, setButton] = useState('confirm');
 
-    useEffect(async () => {
-        if(!!account) {
+    useEffect( () => { 
+        
+        const fetchTokens = async () => {
+            if(!!account) {
 
-            let _acceptedTokens = await getAcceptedTokens();
-            setTokensList(_acceptedTokens);
+                let _acceptedTokens = await getAcceptedTokens();
+                setTokensList(_acceptedTokens);
 
+            }
         }
+
+        fetchTokens();
+
     }, [account]);
     
     const handleButtonState = async (e) => {
@@ -73,15 +79,15 @@ const Recharge = ({userId , userBalance}) => {
             <Paper elevation={5}>
             <Card sx={{ minWidth: 275 }}>
                 <CardContent>
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                    {/* <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                       Low Balance
-                    </Typography>
+                    </Typography> */}
                     
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                    <Typography sx={{ fontSize: 14 }} color='gray' gutterBottom>
                       ID: {userId}
                     </Typography>
 
-                    <Typography variant="h5" component="div">
+                    <Typography variant="h5" component="div" color={'green'}>
                       ₹ {userBalance}
                     </Typography>
                     
@@ -91,6 +97,7 @@ const Recharge = ({userId , userBalance}) => {
                         loading 
                         sx={{margin: 'auto'}} 
                         startIcon={<CachedIcon/>} 
+                        onClick={e => fetchUserData()}
                     >
                         Current Balance
                     </Button>
@@ -108,20 +115,27 @@ const Recharge = ({userId , userBalance}) => {
                 aria-describedby="modal-modal-description"
                 >
                     <Box sx={style} component='form' >
-                        <InputLabel id="demo-simple-select-filled-label">Choose Token</InputLabel>
-                        <Select
-                        labelId="demo-simple-select-filled-label"
-                        id="demo-simple-select-filled"
-                        value={selectedToken}
-                        onChange={e => setSelectedToken(e.target.value)}
-                        >
-                            {acceptedTokensList.map(token => {
-                                return (
-                                    <MenuItem value={token.address}>{token.name} Balance: {token.balance}</MenuItem>
-                                )
-                            })}
-                            
-                        </Select>
+                        <FormControl variant='filled'>
+                            <InputLabel id="demo-simple-select-filled-label">Choose Token</InputLabel>
+                            <Select
+                            labelId="demo-simple-select-filled-label"
+                            id="demo-simple-select-filled"
+                            value={selectedToken}
+                            onChange={e => setSelectedToken(e.target.value)}
+                            >
+                                {acceptedTokensList.map(token => {
+                                    return (
+                                        <MenuItem value={token.address}>
+                                            <div><strong>{token.symbol}</strong></div> 
+                                            
+                                            <div><small>Balance: {token.balance}</small></div>
+                                        </MenuItem>
+                                    )
+                                })}
+                                
+                            </Select>
+                        </FormControl>
+                        <br/>
                         <TextField
                             required
                             id="outlined-required"
