@@ -6,6 +6,13 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import useWallet from "../../../hooks/useWallet";
 import { approveToken, getAcceptedTokens, recharge } from '../../contracts/paymentV1';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import React from 'react';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const style = {
     position: 'absolute',
@@ -21,7 +28,7 @@ const style = {
     p: 4,
   };
 
-const Recharge = ({userId , userBalance, fetchUserData}) => {
+const Recharge = ({userId , userBalances, fetchUserData}) => {
 
     const [open, setOpen] = useState(false);
     const [acceptedTokensList, setTokensList] = useState([]);
@@ -31,6 +38,18 @@ const Recharge = ({userId , userBalance, fetchUserData}) => {
     const [selectedToken, setSelectedToken] = useState('');
     const [rechargeValue, setRechargeValue] = useState(null);
     const [button, setButton] = useState('confirm');
+    const [snackBarMessage, setSnackBarMessage] = useState('');
+    const [snackBarOpen, setSnackBarOpen] = React.useState(false);
+
+  
+    const handleSnackBarClose = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+      setSnackBarOpen(false);
+    };
+
+    
 
     useEffect( () => { 
         
@@ -58,18 +77,24 @@ const Recharge = ({userId , userBalance, fetchUserData}) => {
         }
         else if(button === 'recharge'){
             // recharge
-            await recharge(selectedToken.address, rechargeValue)
+            const transactionHash =await recharge(selectedToken.address, rechargeValue)
             console.log('recharge');
 
-            setOpen(false);
+            if(!!transactionHash){
+                setSnackBarOpen(true);
+                setSnackBarMessage(`Recharge of ${rechargeValue} ${selectedToken.symbol} successful!`);
+                setOpen(false);
+            }
         }
         else{
             console.log('approve');
-            await approveToken(selectedToken.address, rechargeValue);
+            const transactionHash = await approveToken(selectedToken.address, rechargeValue);
 
-            // if(!!transactionHash){
-            setButton('recharge');
-            // }
+            if(!!transactionHash){
+                setSnackBarOpen(true);
+                setSnackBarMessage(`Approved ${rechargeValue} ${selectedToken.symbol} to Payment contract`);
+                setButton('recharge');
+            }
         }
     }
 
@@ -87,7 +112,14 @@ const Recharge = ({userId , userBalance, fetchUserData}) => {
                     </Typography>
 
                     <Typography variant="h5" component="div" color={'green'}>
-                      ₹ {userBalance}
+                      ₹ {
+                        userBalances.map((balanceData, ) => {
+                            return <>
+                                <div><strong>{balanceData.symbol}</strong></div>
+                                <div><small>Balance: {balanceData.balance}</small></div>
+                            </>
+                        })
+                      }
                     </Typography>
                     
                 </CardContent>
@@ -151,7 +183,13 @@ const Recharge = ({userId , userBalance, fetchUserData}) => {
 
                     </Box>
                 </Modal>
+                <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={handleSnackBarClose}>
+                    <Alert onClose={handleSnackBarClose} severity="success" sx={{ width: '100%' }}>
+                        { snackBarMessage }
+                    </Alert>
+                </Snackbar>
         </div>
+        
     )
 }
 

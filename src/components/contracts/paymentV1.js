@@ -74,7 +74,7 @@ export const getUserData = async () => {
             
             return {
               symbol: symbol,
-              balance: toHumanReadable(userData.balances[index], decimals)
+              balance: toHumanReadable(userData.balances[index], decimals).toString()
             }
           }))
     }

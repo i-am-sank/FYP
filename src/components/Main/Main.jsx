@@ -17,7 +17,7 @@ const Main = () => {
     let [contractAddress, setContractAddress] = useState('');
     let [userData, setUserData] = useState({
         id: "0",
-        balance: [""]
+        balances: [""]
     });
 
     const fetchUserData = async () => {
@@ -60,7 +60,11 @@ const Main = () => {
                    </Box>
             </Paper>
             <br/>
-            {userData.id !== "0" ? <Recharge userId={userData.id} userBalance={userData.balance} fetchUserData={fetchUserData} /> : <Initialize/>}
+            {   
+                userData.id !== "0"  
+                ? <Recharge userId={userData.id} userBalances={userData.balances} fetchUserData={fetchUserData} /> 
+                : <Initialize fetchUserData={fetchUserData}/>
+            }
         </div>
     )
 }
