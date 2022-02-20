@@ -4,8 +4,8 @@ import CachedIcon from '@mui/icons-material/Cached';
 import { CardActions, CardContent, Fab, Paper, Modal, Box, TextField, MenuItem } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
-import { getOwner, getUserData } from "../contracts/paymentV1"
 import useWallet from "../../hooks/useWallet";
+import { approveToken, getAcceptedTokens, recharge } from '../../contracts/paymentV1';
 
 const style = {
     position: 'absolute',
@@ -32,20 +32,19 @@ const Recharge = ({userId , userBalance}) => {
     const [rechargeValue, setRechargeValue] = useState(0);
     const [button, setButton] = useState('confirm');
 
-    // useEffect(async () => {
-    //     if(!!account) {
+    useEffect(async () => {
+        if(!!account) {
 
-    //         let _acceptedTokens = await getAcceptedTokens();
-    //         setTokensToken(_acceptedTokens);
+            let _acceptedTokens = await getAcceptedTokens();
+            setTokensList(_acceptedTokens);
 
-    //     }
-    // }, [account]);
+        }
+    }, [account]);
     
     const handleButtonState = async (e) => {
         if(button === 'confirm'){
-            let approvalAmount = await getTokenApproval(selectedToken);
 
-            if(approvalAmount > rechargeValue){
+            if(Number(selectedToken.allowance) > rechargeValue){
                 setButton('recharge');
             }
             else{
@@ -54,7 +53,7 @@ const Recharge = ({userId , userBalance}) => {
         }
         else if(button === 'recharge'){
             // recharg
-            // recharge(selectedToken, rechargeValue)
+            recharge(selectedToken, rechargeValue)
             console.log('recharge');
         }
         else{
@@ -112,7 +111,7 @@ const Recharge = ({userId , userBalance}) => {
                         labelId="demo-simple-select-filled-label"
                         id="demo-simple-select-filled"
                         value={selectedToken}
-                        onChange={e => console.log(e.target.value)}
+                        onChange={e => setSelectedToken(e.target.value)}
                         >
                             {acceptedTokensList.map(token => {
                                 return (
@@ -126,6 +125,8 @@ const Recharge = ({userId , userBalance}) => {
                             id="outlined-required"
                             label="Amount"
                             placeholder='Enter Amount'
+                            value={rechargeValue}
+                            onChange={e => setRechargeValue(Number(e.target.value))}
                         />
                         <br/>
                         
