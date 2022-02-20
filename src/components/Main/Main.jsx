@@ -6,6 +6,8 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { getOwner, getUserData, initializeUser } from "../contracts/paymentV1"
 import useWallet from "../../hooks/useWallet";
+import Recharge from './components/Recharge';
+import Initialize from './components/Initialize';
 
 const style = {
     position: 'absolute',
@@ -32,6 +34,7 @@ const Main = () => {
     } = useWallet();
 
     let [owner, setOwner] = useState('');
+    let [contractAddress, setContractAddress] = useState('');
     let [userData, setUserData] = useState({
         id: "",
         balance: ""
@@ -39,70 +42,31 @@ const Main = () => {
 
     useEffect(async () => {
         if(!!account) {
-            owner = await getOwner();
-            setOwner(owner);
+            let _owner = await getOwner();
+            setOwner(_owner);
 
-            userData = await getUserData();
-            setUserData(userData);
+            let _userData = await getUserData();
+            setUserData(_userData);
+
+                // let _contractAddress = await getPaymentContractAddress();
+            // setContractAddress(_contractAddress);
+        
         }
     }, [account]);
     
     console.log(owner);
     return (
         <div>
-            <div>
-                <label>Owner</label>
-                <div>{ owner }</div>
-                <h1>User data</h1>
-                <label>Id</label>
-                <div>{ userData.id.toString() }</div> 
-                <div>{ userData.balance.toString() }</div>
-                <button onClick={initializeUser}>
-                    Initialize User
-                </button>
-            </div>
-            <Paper elevation={5}>
-            <Card sx={{ minWidth: 275 }}>
-                <CardContent>
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                      Low Balance
+            <Paper>
+                   <Typography variant='subtitle1' component='a' >
+                      Contract Address : 
                     </Typography>
-                    
-                    <Typography variant="h5" component="div">
-                    ₹ 20.03
-                    </Typography>
-                    
-                </CardContent>
-                <CardActions>
-                    <Button loading sx={{margin: 'auto'}} startIcon={<CachedIcon/> } >Current Balance</Button>
-                </CardActions>
-            </Card>
-            </Paper>
-            <br/>
-            <Fab variant='extended' onClick={e => setOpen(true)}>
-                Recharge Now
-             </Fab>
-             <Modal
-                open={open}
-                onClose={e => setOpen(false)}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-                >
-                    <Box sx={style} component='form' >
-                    <TextField
-                        required
-                        id="outlined-required"
-                        label="Amount"
-                        placeholder='Enter Amount'
-                    />
-                    <br/>
-                    
-                    <Fab variant='extended' sx={{width: 120, margin: 'auto', backgroundColor: 'blanchedalmond' }} >
-                        Recharge
-                    </Fab>
 
-                    </Box>
-                </Modal>
+                    <Typography variant='subtitle2' component="a">
+                      Contract Owner : {owner}
+                    </Typography>
+            </Paper>
+            {userData.id ? <Recharge userId={userData.id} userBalance={userData.balance} /> : <Initialize/>}
         </div>
     )
 }
