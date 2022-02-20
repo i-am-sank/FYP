@@ -58,14 +58,14 @@ const Recharge = ({userId , userBalance, fetchUserData}) => {
         }
         else if(button === 'recharge'){
             // recharge
-            recharge(selectedToken, rechargeValue)
+            recharge(selectedToken.address, rechargeValue)
             console.log('recharge');
 
             setOpen(false);
         }
         else{
             console.log('approve');
-            await approveToken(selectedToken, rechargeValue);
+            await approveToken(selectedToken.address, rechargeValue);
 
             // if(!!transactionHash){
             setButton('recharge');

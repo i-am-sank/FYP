@@ -1,13 +1,10 @@
-import {ethers} from "ethers";
+import {ethers, BigNumber} from "ethers";
 import paymentContractAbi from "./abi/PaymentV1.json"
 import erc20Abi from "./abi/ERC20.json"
 
-const contractAddress = '0xF14b22D8830E6fB02eb80192102bB08156e00AB3';
-// todo: Modify contract to returns this from the contract
-const acceptedTokens = [
-    '0xa36085F69e2889c224210F603D836748e7dC0088'
-];
+const contractAddress = '0x466598fCDD496C218e2Eb07EB7aCbCeaD9C1A25E';
 
+// Helper functions
 export const getProvider = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
@@ -30,7 +27,22 @@ export const getTokenContract = async (providerOrSigner, tokenAddress) => {
     )
 }
 
+export const toHumanReadable = (amount, decimals) => {
+    return amount.div(BigNumber.from('10').pow(decimals))
+}
+
+export const toDecimals = (amount, decimals) => {
+    return BigNumber.from(amount).mul(BigNumber.from('10').pow(decimals))
+}
+
 // View functions
+
+export const getAcceptedTokensList = async () => {
+    const provider = await getProvider();
+    const paymentContract = await getPaymentContract(provider);
+    const acceptedTokensList = await paymentContract.getAllAcceptedTokens();
+    return acceptedTokensList;
+}
 
 export const getPaymentContractAddress = () => {
     return contractAddress;
@@ -49,11 +61,21 @@ export const getUserData = async () => {
 
     const signer = await provider.getSigner();
     const signerAddress = await signer.getAddress();
-    
-    const userData = await paymentContract.users(signerAddress);
+
+    const userData = await paymentContract.getUserData(signerAddress);
+
     return {
         id: userData.id.toString(),
-        balance: userData.balance.toString()
+        balances: await Promise.all(userData.tokens.map(async (tokenAddress, index) => {
+            const tokenContract = await getTokenContract(provider, tokenAddress);
+            const symbol = await tokenContract.symbol();
+            const decimals = await tokenContract.decimals();
+            
+            return {
+              symbol: symbol,
+              balance: toHumanReadable(userData.balances[index], decimals)
+            }
+          }))
     }
 }
 
@@ -62,20 +84,23 @@ export const getAcceptedTokens = async () => {
     const provider = await getProvider();
     const signer = await provider.getSigner();
     const signerAddress = await signer.getAddress();
+    const acceptedTokens = await getAcceptedTokensList();
 
     return await Promise.all(acceptedTokens.map(async (tokenAddress, ) => {
       const tokenContract = await getTokenContract(provider, tokenAddress);
       const tokenName = await tokenContract.name();
       const symbol = await tokenContract.symbol();
+      const decimals = await tokenContract.decimals();
       const userBalance = await tokenContract.balanceOf(signerAddress);
       const userAllowance = await tokenContract.allowance(signerAddress, contractAddress);
-
+      
       return {
         address: tokenAddress,
         name: tokenName,
         symbol: symbol,
-        balance: userBalance.toString(),
-        allowance: userAllowance.toString()
+        decimals: decimals.toString(),
+        balance: toHumanReadable(userBalance, decimals).toString(),
+        allowance: toHumanReadable(userAllowance, decimals).toString()
       }
     }));
 }
@@ -93,12 +118,21 @@ export const approveToken = async (tokenAddress, amount) => {
     const provider = await getProvider();
     const signer = await provider.getSigner();
     const tokenContract = await getTokenContract(signer, tokenAddress);
-    await tokenContract.approve(contractAddress, amount);
+    
+    const tokenDecimals = await tokenContract.decimals();
+    const amountWithDecimals = toDecimals(amount, tokenDecimals);
+
+    await tokenContract.approve(contractAddress, amountWithDecimals);
 }
 
 export const recharge = async (tokenAddress, amount) => {
     const provider = await getProvider();
     const signer = await provider.getSigner();
     const paymentContract = await getPaymentContract(signer);
-    await paymentContract.recharge(tokenAddress, amount);
+
+    const tokenContract = await getTokenContract(signer, tokenAddress);
+    const tokenDecimals = await tokenContract.decimals();
+    const amountWithDecimals = toDecimals(amount, tokenDecimals);
+
+    await paymentContract.recharge(tokenAddress, amountWithDecimals);
 }

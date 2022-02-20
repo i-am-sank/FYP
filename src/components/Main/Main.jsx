@@ -17,7 +17,7 @@ const Main = () => {
     let [contractAddress, setContractAddress] = useState('');
     let [userData, setUserData] = useState({
         id: "0",
-        balance: ""
+        balance: [""]
     });
 
     const fetchUserData = async () => {
