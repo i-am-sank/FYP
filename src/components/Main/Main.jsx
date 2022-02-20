@@ -3,7 +3,9 @@ import Card from '@mui/material/Card';
 import CachedIcon from '@mui/icons-material/Cached';
 import { CardActions, CardContent, Fab, Paper, Modal, Box, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getOwner, getUserData, initializeUser } from "../contracts/paymentV1"
+import useWallet from "../../hooks/useWallet";
 
 const style = {
     position: 'absolute',
@@ -23,8 +25,42 @@ const Main = () => {
 
     const [open, setOpen] = useState(false);
 
+    const {
+        account,
+        status,
+        connect,
+    } = useWallet();
+
+    let [owner, setOwner] = useState('');
+    let [userData, setUserData] = useState({
+        id: "",
+        balance: ""
+    });
+
+    useEffect(async () => {
+        if(!!account) {
+            owner = await getOwner();
+            setOwner(owner);
+
+            userData = await getUserData();
+            setUserData(userData);
+        }
+    }, [account]);
+    
+    console.log(owner);
     return (
         <div>
+            <div>
+                <label>Owner</label>
+                <div>{ owner }</div>
+                <h1>User data</h1>
+                <label>Id</label>
+                <div>{ userData.id.toString() }</div> 
+                <div>{ userData.balance.toString() }</div>
+                <button onClick={initializeUser}>
+                    Initialize User
+                </button>
+            </div>
             <Paper elevation={5}>
             <Card sx={{ minWidth: 275 }}>
                 <CardContent>
