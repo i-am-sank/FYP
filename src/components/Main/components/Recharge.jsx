@@ -58,7 +58,7 @@ const Recharge = ({userId , userBalance, fetchUserData}) => {
         }
         else if(button === 'recharge'){
             // recharge
-            recharge(selectedToken.address, rechargeValue)
+            await recharge(selectedToken.address, rechargeValue)
             console.log('recharge');
 
             setOpen(false);

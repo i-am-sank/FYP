@@ -1,6 +1,7 @@
-import {ethers, BigNumber} from "ethers";
+import {ethers, BigNumber, wait} from "ethers";
 import paymentContractAbi from "./abi/PaymentV1.json"
 import erc20Abi from "./abi/ERC20.json"
+
 
 const contractAddress = '0x466598fCDD496C218e2Eb07EB7aCbCeaD9C1A25E';
 
@@ -111,7 +112,9 @@ export const initializeUser = async (ipAddress) => {
     const provider = await getProvider();
     const signer = await provider.getSigner();
     const paymentContract = await getPaymentContract(signer);
-    await paymentContract.initializeUser(ipAddress);
+    const transaction = await paymentContract.initializeUser(ipAddress);
+    const receipt = await transaction.wait()
+    return receipt.transactionHash;
 }
 
 export const approveToken = async (tokenAddress, amount) => {
@@ -122,7 +125,9 @@ export const approveToken = async (tokenAddress, amount) => {
     const tokenDecimals = await tokenContract.decimals();
     const amountWithDecimals = toDecimals(amount, tokenDecimals);
 
-    await tokenContract.approve(contractAddress, amountWithDecimals);
+    const transaction = await tokenContract.approve(contractAddress, amountWithDecimals);
+    const receipt = await transaction.wait()
+    return receipt.transactionHash;
 }
 
 export const recharge = async (tokenAddress, amount) => {
@@ -134,5 +139,7 @@ export const recharge = async (tokenAddress, amount) => {
     const tokenDecimals = await tokenContract.decimals();
     const amountWithDecimals = toDecimals(amount, tokenDecimals);
 
-    await paymentContract.recharge(tokenAddress, amountWithDecimals);
+    const transaction = await paymentContract.recharge(tokenAddress, amountWithDecimals);
+    const receipt = await transaction.wait()
+    return receipt.transactionHash;
 }
