@@ -64,7 +64,7 @@ const Recharge = ({userId , userBalances, fetchUserData}) => {
 
         fetchTokens();
 
-    }, [account]);
+    }, [account, userBalances]);
     
     const handleButtonState = async (e) => {
         if(button === 'confirm'){
