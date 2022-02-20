@@ -16,7 +16,7 @@ const Main = () => {
     let [owner, setOwner] = useState('');
     let [contractAddress, setContractAddress] = useState('');
     let [userData, setUserData] = useState({
-        id: "",
+        id: "0",
         balance: ""
     });
 

@@ -28,7 +28,7 @@ const Recharge = ({userId , userBalance, fetchUserData}) => {
     const {
         account
     } = useWallet();
-    const [selectedToken, setSelectedToken] = useState(null);
+    const [selectedToken, setSelectedToken] = useState('');
     const [rechargeValue, setRechargeValue] = useState(null);
     const [button, setButton] = useState('confirm');
 
@@ -49,7 +49,6 @@ const Recharge = ({userId , userBalance, fetchUserData}) => {
     
     const handleButtonState = async (e) => {
         if(button === 'confirm'){
-
             if(Number(selectedToken.allowance) > rechargeValue){
                 setButton('recharge');
             }
@@ -125,7 +124,7 @@ const Recharge = ({userId , userBalance, fetchUserData}) => {
                             >
                                 {acceptedTokensList.map(token => {
                                     return (
-                                        <MenuItem value={token.address}>
+                                        <MenuItem value={token}>
                                             <div><strong>{token.symbol}</strong></div> 
                                             
                                             <div><small>Balance: {token.balance}</small></div>
