@@ -1,5 +1,6 @@
 import {  Fab, Paper, Box, TextField } from '@mui/material';
-import { initializeUser } from "../contracts/paymentV1"
+import { initializeUser } from "../../contracts/paymentV1"
+import {useState} from "react";
 
 
 const style = {
@@ -18,6 +19,8 @@ const style = {
 
 const Initialize = () => {
 
+    const [ipAddress, setIpAddress] = useState('');
+
     return (
             <Paper elevation={5}>
              <Box sx={style} component='form' >
@@ -26,13 +29,15 @@ const Initialize = () => {
                         id="outlined-required"
                         label="IP Address"
                         placeholder='Enter IP Address'
+                        value={ipAddress}
+                        onChange={(e) => setIpAddress(e.target.value)}
                     />
                     <br/>
                     
                     <Fab 
                         variant='extended' 
                         sx={{width: 120, margin: 'auto', backgroundColor: 'blanchedalmond' }}
-                        onClick={initializeUser} 
+                        onClick={(e) => initializeUser(ipAddress)} 
                     >
                         Initialise 
                     </Fab>

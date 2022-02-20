@@ -1,10 +1,10 @@
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CachedIcon from '@mui/icons-material/Cached';
-import { CardActions, CardContent, Fab, Paper, Modal, Box, TextField, MenuItem } from '@mui/material';
+import { CardActions, CardContent, Fab, Paper, Modal, Box, TextField, MenuItem, InputLabel, Select } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
-import useWallet from "../../hooks/useWallet";
+import useWallet from "../../../hooks/useWallet";
 import { approveToken, getAcceptedTokens, recharge } from '../../contracts/paymentV1';
 
 const style = {
@@ -52,17 +52,19 @@ const Recharge = ({userId , userBalance}) => {
             }
         }
         else if(button === 'recharge'){
-            // recharg
+            // recharge
             recharge(selectedToken, rechargeValue)
             console.log('recharge');
+
+            setOpen(false);
         }
         else{
             console.log('approve');
-            let transactionHash = await approveToken(selectedToken, rechargeValue);
+            await approveToken(selectedToken, rechargeValue);
 
-            if(!!transactionHash){
-                setButton('recharge');
-            }
+            // if(!!transactionHash){
+            setButton('recharge');
+            // }
         }
     }
 

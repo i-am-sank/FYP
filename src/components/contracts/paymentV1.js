@@ -92,7 +92,7 @@ export const initializeUser = async (ipAddress) => {
 export const approveToken = async (tokenAddress, amount) => {
     const provider = await getProvider();
     const signer = await provider.getSigner();
-    const tokenContract = await getTokenContract(tokenAddress, signer);
+    const tokenContract = await getTokenContract(signer, tokenAddress);
     await tokenContract.approve(contractAddress, amount);
 }
 

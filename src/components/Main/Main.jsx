@@ -48,7 +48,7 @@ const Main = () => {
                       Contract Owner : {owner}
                     </Typography>
             </Paper>
-            {userData.id ? <Recharge userId={userData.id} userBalance={userData.balance} /> : <Initialize/>}
+            {userData.id !== "0" ? <Recharge userId={userData.id} userBalance={userData.balance} /> : <Initialize/>}
         </div>
     )
 }
